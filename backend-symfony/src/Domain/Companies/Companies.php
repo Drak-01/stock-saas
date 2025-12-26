@@ -5,7 +5,8 @@ namespace App\Domain\Companies;
 use App\Repository\CompaniesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompaniesRepository::class)]
@@ -18,6 +19,10 @@ class Companies
     #[ORM\Column(type: Types::INTEGER)]
     #[Groups(['company:read'])]
     private ?int $id = null;
+
+    #[ORM\Column(type: Types::GUID, unique: true)]
+    #[Groups(['company:read'])]
+    private string $uuid;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
@@ -68,6 +73,8 @@ class Companies
 
     public function __construct()
     {
+        $this->uuid = Uuid::v4()->toRfc4122();
+
         $this->settings = [
             'currency' => 'EUR',
             'timezone' => 'Europe/Paris',
@@ -88,6 +95,11 @@ class Companies
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
     }
 
     public function getName(): string
@@ -221,7 +233,7 @@ class Companies
     // Helper methods
     public function getFullDomain(): string
     {
-        return $this->subdomain . '.' . $_ENV['APP_DOMAIN'] ?? 'localhost';
+        return $this->subdomain . '.' . ($_ENV['APP_DOMAIN'] ?? 'localhost');
     }
 
     public function getDatabaseName(): string
@@ -238,6 +250,7 @@ class Companies
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'name' => $this->name,
             'subdomain' => $this->subdomain,
             'companyType' => $this->companyType,
