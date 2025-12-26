@@ -24,7 +24,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
             - '../src/Entity'
-            - '../src/Controller/'  # Exclut l'ancien dossier Controller si présent
+            - '../src/Controller/'  
 
     # Configuration des contrôleurs Admin (couche présentation - DDD)
     App\Http\Admin\Controller\: 
