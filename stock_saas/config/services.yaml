@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# Ce fichier configure les services de l'application
+# Architecture DDD (Domain-Driven Design)
+# Voir https://symfony.com/doc/current/service_container/import.html
+
+# Paramètres de l'application
+parameters:
+    admin_prefix: '%env(resolve:ADMIN_PREFIX)%'
+    client_prefix: '%env(resolve:CLIENT_PREFIX)%'
+
+services:
+    # Configuration par défaut pour tous les services
+    _defaults:
+        autowire: true      # Injection automatique des dépendances
+        autoconfigure: true # Configuration automatique (commandes, event subscribers, etc.)
+
+    # Configuration globale des classes dans src/
+    # Exclut les dossiers qui ne doivent pas être des services
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Entity'
+            - '../src/Controller/'  # Exclut l'ancien dossier Controller si présent
+
+    # Configuration des contrôleurs Admin (couche présentation - DDD)
+    App\Http\Admin\Controller\: 
+        resource: '../src/Http/Admin/Controller'
+        tags: ['controller.service_arguments']
+
+    # Configuration des contrôleurs Client (couche présentation - DDD)
+    App\Http\Client\Controller\: 
+        resource: '../src/Http/Client/Controller'
+        tags: ['controller.service_arguments']
+
+    # Configuration des services du domaine (Domain Layer - DDD)
+    # Les services du domaine peuvent être configurés ici si nécessaire
+    # App\Domain\:
+    #     resource: '../src/Domain/'
+
+    # Configuration des repositories (Infrastructure Layer - DDD)
+    # Les repositories Doctrine sont généralement auto-configurés
+    # App\Repository\:
+    #     resource: '../src/Repository/'
